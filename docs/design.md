@@ -36,22 +36,21 @@ The approved visual design is captured in **8 reference images** stored in `asse
 
 | # | Image | Sample of | Pattern it demonstrates |
 |---|---|---|---|
-| 1 | ![Citizen — Land Record](assets/Citizen—LandRecord.png) | Citizen detail page | Citizen header with flag accent line, prominent Transaction Status panel, details cards, ownership table, process timeline |
-| 2 | ![Dolil Lekhok — Create Deed](assets/DolilLekhokCreateDeed.png) | Staff wizard step | Staff console shell (dark sidebar), 7‑step stepper, two-option choice cards (Upload vs paid Import), summary side card |
-| 3 | ![Mutation Officer — Review](assets/MutationOfficerReview) | Officer review page | Split review, Deed‑vs‑CS/RS comparison table, match/mismatch highlighting, checklist, approve/reject + required rejection form |
-| 4 | ![Design System](assets/DesignSystem.png) | Design-system sheet | Tokens, status badges, buttons, form fields, typography |
-| 5 | ![Dolil Lekhok — Deed Editor](assets/DolilLekhokDeedEditor.png) | Document editor | Structured-data column + document preview; distinguishing Verified / System‑generated / Editable data |
-| 6 | ![Sub-Registrar — Deed Review](assets/Sub-Registrar—DeedReview.png) | Decision/approval page | Ordered review sections, payment table, checklist, decision panel, confirmation & rejection dialogs |
-| 7 | ![Deed Registered & Notifications](assets/DeedRegistered&Notifications.png) | Success + notification feed | Success banner, "next required action" card with auto‑filled items, action‑oriented notification list |
+| 1 | ![Citizen — Land Record](../assets/Citizen—LandRecord.png) | Citizen detail page | Citizen header with flag accent line, prominent Transaction Status panel, details cards, ownership table, process timeline |
+| 2 | ![Dolil Lekhok — Create Deed](../assets/DolilLekhokCreateDeed.png) | Staff wizard step | Staff console shell (dark sidebar), 7‑step stepper, two-option choice cards (Upload vs paid Import), summary side card |
+| 3 | ![Mutation Officer — Review](../assets/MutationOfficerReview.png) | Officer review page | Split review, Deed‑vs‑CS/RS comparison table, match/mismatch highlighting, checklist, approve/reject + required rejection form |
+| 4 | ![Design System](../assets/DesignSystem.png) | Design-system sheet | Tokens, status badges, buttons, form fields, typography |
+| 5 | ![Dolil Lekhok — Deed Editor](../assets/DolilLekhokDeedEditor.png) | Document editor | Structured-data column + document preview; distinguishing Verified / System‑generated / Editable data |
+| 6 | ![Sub-Registrar — Deed Review](../assets/Sub-Registrar—DeedReview.png) | Decision/approval page | Ordered review sections, payment table, checklist, decision panel, confirmation & rejection dialogs |
+| 7 | ![Deed Registered & Notifications](../assets/DeedRegistered&Notifications.png) | Success + notification feed | Success banner, "next required action" card with auto‑filled items, action‑oriented notification list |
 
 
 Which image to use for which kind of task (by pattern, not by page name):
-- Citizen-facing pages, detail views, public header/footer → **images 1, 7, 8**
+- Citizen-facing pages, detail views, public header/footer → **images 1, 7**
 - Any staff/officer/admin page (sidebar shell, wizards, multi-step forms) → **images 2, 5, 6**
 - Review, verification, comparison, approve/reject, dialogs → **images 3, 6**
 - Document/long-form editing with mixed data types → **image 5**
 - Notifications, success states, next-action prompts → **image 7**
-- Maps and geographic views → **image 8**
 - Any new component, badge, button, form field, or color decision → **image 4**
 
 New screens must look like they belong to this same set. In your final message after UI work, state which reference image(s) you took the *pattern* from, and confirm you used real/requirement-driven content rather than the sample text.
