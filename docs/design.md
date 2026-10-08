@@ -36,14 +36,14 @@ The approved visual design is captured in **8 reference images** stored in `asse
 
 | # | Image | Sample of | Pattern it demonstrates |
 |---|---|---|---|
-| 1 | ![Citizen — Land Record](assets/design-reference/01-citizen-land-record.png) | Citizen detail page | Citizen header with flag accent line, prominent Transaction Status panel, details cards, ownership table, process timeline |
-| 2 | ![Dolil Lekhok — Create Deed](assets/design-reference/02-dolil-lekhok-create-deed.png) | Staff wizard step | Staff console shell (dark sidebar), 7‑step stepper, two-option choice cards (Upload vs paid Import), summary side card |
-| 3 | ![Mutation Officer — Review](assets/design-reference/03-mutation-officer-review.png) | Officer review page | Split review, Deed‑vs‑CS/RS comparison table, match/mismatch highlighting, checklist, approve/reject + required rejection form |
-| 4 | ![Design System](assets/design-reference/04-design-system.png) | Design-system sheet | Tokens, status badges, buttons, form fields, typography |
-| 5 | ![Dolil Lekhok — Deed Editor](assets/design-reference/05-deed-editor.png) | Document editor | Structured-data column + document preview; distinguishing Verified / System‑generated / Editable data |
-| 6 | ![Sub-Registrar — Deed Review](assets/design-reference/06-sub-registrar-review.png) | Decision/approval page | Ordered review sections, payment table, checklist, decision panel, confirmation & rejection dialogs |
-| 7 | ![Deed Registered & Notifications](assets/design-reference/07-deed-registered-notifications.png) | Success + notification feed | Success banner, "next required action" card with auto‑filled items, action‑oriented notification list |
-| 8 | ![Citizen — Land Map](assets/design-reference/08-land-map.png) | Map page | Muted base map, lettered category markers (not color‑only), layer list/search panel, selected‑item popup with status |
+| 1 | ![Citizen — Land Record](assets/Citizen—LandRecord.png) | Citizen detail page | Citizen header with flag accent line, prominent Transaction Status panel, details cards, ownership table, process timeline |
+| 2 | ![Dolil Lekhok — Create Deed](assets/DolilLekhokCreateDeed.png) | Staff wizard step | Staff console shell (dark sidebar), 7‑step stepper, two-option choice cards (Upload vs paid Import), summary side card |
+| 3 | ![Mutation Officer — Review](assets/MutationOfficerReview) | Officer review page | Split review, Deed‑vs‑CS/RS comparison table, match/mismatch highlighting, checklist, approve/reject + required rejection form |
+| 4 | ![Design System](assets/DesignSystem.png) | Design-system sheet | Tokens, status badges, buttons, form fields, typography |
+| 5 | ![Dolil Lekhok — Deed Editor](assets/DolilLekhokDeedEditor.png) | Document editor | Structured-data column + document preview; distinguishing Verified / System‑generated / Editable data |
+| 6 | ![Sub-Registrar — Deed Review](assets/Sub-Registrar—DeedReview.png) | Decision/approval page | Ordered review sections, payment table, checklist, decision panel, confirmation & rejection dialogs |
+| 7 | ![Deed Registered & Notifications](assets/DeedRegistered&Notifications.png) | Success + notification feed | Success banner, "next required action" card with auto‑filled items, action‑oriented notification list |
+
 
 Which image to use for which kind of task (by pattern, not by page name):
 - Citizen-facing pages, detail views, public header/footer → **images 1, 7, 8**
