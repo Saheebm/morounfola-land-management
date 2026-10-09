@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './shared/db.js';
+import { simulatedAuthMiddleware } from './shared/authMiddleware.js';
 
 dotenv.config();
 
@@ -12,20 +13,19 @@ app.use(cors());
 app.use(express.json());
 
 // Simulated auth middleware
-app.use((req: Request, _res: Response, next) => {
-  const role = req.headers['x-role'] || 'citizen';
-  (req as any).user = {
-    role,
-    name: `Demo ${role}`,
-  };
-  next();
-});
+app.use(simulatedAuthMiddleware);
 
 app.get('/api/health', (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
     service: 'BhumiLink API',
     timestamp: new Date().toISOString(),
+  });
+});
+
+app.get('/api/auth/me', (req: Request, res: Response) => {
+  res.json({
+    user: req.user,
   });
 });
 
