@@ -98,8 +98,18 @@ export function CitizenLayout() {
             {/* Notification Bell */}
             <button
               type="button"
-              className="relative p-2 rounded-lg text-ink-muted hover:text-ink hover:bg-surface-sunken cursor-pointer transition-colors"
-              aria-label={`Notifications (${unreadCount} unread)`}
+              disabled
+              className="relative cursor-not-allowed rounded-lg p-2 text-ink-muted opacity-60"
+              aria-label={
+                language === 'bn'
+                  ? 'প্রোটোটাইপে বিজ্ঞপ্তি সুবিধা চালু নেই'
+                  : 'Notifications are unavailable in this prototype'
+              }
+              title={
+                language === 'bn'
+                  ? 'প্রোটোটাইপে বিজ্ঞপ্তি সুবিধা চালু নেই'
+                  : 'Notifications are unavailable in this prototype'
+              }
             >
               <Bell size={20} aria-hidden="true" />
               {unreadCount > 0 && (

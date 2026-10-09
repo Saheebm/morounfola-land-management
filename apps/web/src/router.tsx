@@ -3,6 +3,9 @@ import { CitizenLayout } from './layouts/CitizenLayout';
 import { StaffLayout } from './layouts/StaffLayout';
 import { KitchenSink } from './pages/KitchenSink';
 import { Services } from './pages/citizen/Services';
+import { LandRecords } from './pages/citizen/LandRecords';
+import { Notices } from './pages/citizen/Notices';
+import { ServiceStatus } from './pages/citizen/ServiceStatus';
 import { DolilLekhokDashboard } from './pages/dolil-lekhok/Dashboard';
 import { SubRegistrarDashboard } from './pages/sub-registrar/Dashboard';
 import { MutationOfficerDashboard } from './pages/mutation-officer/Dashboard';
@@ -16,10 +19,11 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Services /> },
       { path: 'citizen/services', element: <Services /> },
-      { path: 'citizen/land-records', element: <Services /> },
-      { path: 'citizen/map', element: <Services /> },
-      { path: 'citizen/notices', element: <Services /> },
-      { path: 'citizen/track', element: <Services /> },
+      { path: 'citizen/land-records', element: <LandRecords /> },
+      { path: 'citizen/map', element: <ServiceStatus /> },
+      { path: 'citizen/notices', element: <Notices /> },
+      { path: 'citizen/track', element: <ServiceStatus /> },
+      { path: 'citizen/land-tax', element: <ServiceStatus /> },
       { path: 'kitchen-sink', element: <KitchenSink /> },
     ],
   },

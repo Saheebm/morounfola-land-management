@@ -31,7 +31,7 @@ export const useAppStore = create<AppState>((set) => ({
   setActiveRole: (role) => set({ activeRole: role }),
   language: 'bn',
   setLanguage: (lang) => set({ language: lang }),
-  unreadNotificationsCount: 2,
+  unreadNotificationsCount: 0,
   setUnreadNotificationsCount: (count) => set({ unreadNotificationsCount: count }),
   toasts: [],
   addToast: (toast) => {

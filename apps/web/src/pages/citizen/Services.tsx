@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/Card';
 import { StatusBadge } from '../../components/StatusBadge';
-import { TransactionStatusPanel } from '../../components/TransactionStatusPanel';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../lib/api';
 
@@ -90,27 +89,27 @@ export function Services() {
       icon: Search,
       titleBn: 'জমির রেকর্ড ও খতিয়ান অনুসন্ধান',
       titleEn: 'Land Record & Khatian Search',
-      descBn: 'অনলাইনে মৌজা, দাগ ও খতিয়ান নম্বর দিয়ে জমির সর্বশেষ মালিকানা রেকর্ড অনুসন্ধান করুন।',
-      descEn: 'Search verified land ownership records by Mouza, Dag, and Khatian.',
-      badge: 'তাত্ক্ষণিক যাচাই',
+      descBn: 'ডেমো ডেটায় মৌজা, দাগ ও খতিয়ান নম্বর দিয়ে নমুনা রেকর্ড অনুসন্ধান করুন।',
+      descEn: 'Search sample records by Mouza, Dag, and Khatian in demo data.',
+      badge: 'নমুনা রেকর্ড',
     },
     {
-      to: '/citizen/land-records',
+      to: '/citizen/land-tax',
       icon: CreditCard,
       titleBn: 'ভূমি উন্নয়ন কর ও ই-দাখিলা',
       titleEn: 'Land Tax Payment & E-Dakhila',
-      descBn: 'বকেয়া ও চলতি বছরের ভূমি উন্নয়ন কর হিসাব করুন, পরিশোধ করুন এবং ডিজিটাল দাখিলা সংগ্রহ করুন।',
-      descEn: 'Calculate and pay land development taxes, and download official digital Dakhila.',
-      badge: 'অনলাইন পেমেন্ট',
+      descBn: 'কর হিসাব, পেমেন্ট ও দাখিলা এই প্রোটোটাইপে এখনো চালু করা হয়নি।',
+      descEn: 'Tax calculation, payment, and Dakhila generation are not available in this prototype.',
+      badge: 'পরিকল্পনাধীন',
     },
     {
       to: '/citizen/map',
       icon: MapPin,
       titleBn: 'স্মার্ট জিআইএস ভূমি ম্যাপ',
       titleEn: 'Smart GIS Parcel Map',
-      descBn: 'ইন্টারেক্টিভ ডিজিটাল ম্যাপে দাগ চিহ্নিতকরণ ও ভূমির অবস্থান ও ব্যবহারের ধরন পর্যবেক্ষণ করুন।',
-      descEn: 'Interactive map displaying verified plot boundaries and public infrastructure.',
-      badge: 'স্মার্ট ম্যাপ',
+      descBn: 'ইন্টারেক্টিভ ম্যাপ ও পার্সেল সীমানা এই প্রোটোটাইপে এখনো চালু করা হয়নি।',
+      descEn: 'Interactive maps and parcel boundaries are not available in this prototype.',
+      badge: 'পরিকল্পনাধীন',
     },
     {
       to: '/citizen/notices',
@@ -125,13 +124,6 @@ export function Services() {
 
   return (
     <div className="space-y-8">
-      {/* Prominent Transaction Status Banner */}
-      <TransactionStatusPanel
-        status="Available"
-        actionTextBn="নমুনা রেকর্ড যাচাই করুন"
-        actionTextEn="Verify Sample Record"
-        onActionClick={() => {}}
-      />
 
       {/* API Health & Live Connectivity Indicator */}
       <div className="flex items-center justify-between p-3.5 rounded-xl border border-brand-200 bg-white shadow-card flex-wrap gap-3">

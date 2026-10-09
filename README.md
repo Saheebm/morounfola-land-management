@@ -2,6 +2,29 @@
 
 **BhumiLink** is a digital land services portal designed to provide transparent land registration, prevent fraudulent double-selling through real-time transaction-safety status visibility, and coordinate multi-step workflows between citizens and government land officials in Bangladesh.
 
+> **Implementation status:** This repository is a prototype, not a complete or production-ready land-services platform. Working backend integrations currently cover API health, sample parcel lookup, public notice listing, and basic counts. Citizen record search and notice browsing use those APIs. Role switching is simulated and does not authenticate or authorize real users. The deed, payment, mutation, tax, map, notification, and administration workflows described below remain incomplete unless explicitly noted as implemented in the source.
+
+### Currently available
+
+- Citizen parcel lookup by Mouza, Dag, or Khatian against the sample parcel API.
+- Public notice browsing against the notice API.
+- API health and database connectivity checks.
+- Shared layouts and UI components, plus demo role and language switching.
+- Staff consoles currently display prototype data; their work queues and actions are not connected.
+
+### Major functions still to implement
+
+- Real sign-in, identity verification, session management, and server-enforced role permissions.
+- Land-tax calculation, payment processing, and Dakhila generation.
+- CS/RS record search/purchase workflows, document uploads, and official-copy generation.
+- The complete deed wizard, draft persistence, file handling, payment, sub-registrar review, approval/rejection, and Digital Dolil generation.
+- Mutation application, officer review, rejection/correction, approval, and atomic RS/BS ownership updates.
+- Interactive geographic parcel map and usable application/transaction tracking.
+- Notifications, payment history, audit logging, complete reports, and admin user/notice management.
+- Automated tests for API validation, permissions, critical workflows, and browser-level behavior.
+
+Database seed records are demo data, PDFs/payments are not implemented as real services, and no information shown by this prototype should be treated as an official land record.
+
 ---
 
 ## 1. Features Completed in Phase 1
