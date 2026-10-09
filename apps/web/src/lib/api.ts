@@ -1,6 +1,21 @@
 import { useAppStore } from '../store/useAppStore';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+/**
+ * Resolves and normalizes the API base URL.
+ * Supports:
+ * - Full URL with /api (e.g. https://api.example.com/api)
+ * - Full URL without /api (e.g. https://api.example.com)
+ * - Dev fallback (http://localhost:5000/api)
+ * - Production relative fallback (/api)
+ */
+function getApiBaseUrl(): string {
+  const envUrl = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
+  if (envUrl) {
+    return envUrl;
+  }
+  // If not configured, use localhost in development, or relative /api in production
+  return import.meta.env.DEV ? 'http://localhost:5000/api' : '/api';
+}
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
@@ -20,8 +35,16 @@ export class ApiError extends Error {
 
 async function request<T = any>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const { params, headers, ...customConfig } = options;
+  const baseUrl = getApiBaseUrl();
 
-  let url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  let normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+
+  // Prevent duplicate /api/api/... if baseUrl already includes /api
+  if (baseUrl.endsWith('/api') && normalizedEndpoint.startsWith('/api/')) {
+    normalizedEndpoint = normalizedEndpoint.slice(4);
+  }
+
+  let url = `${baseUrl}${normalizedEndpoint}`;
 
   if (params) {
     const searchParams = new URLSearchParams();
@@ -63,7 +86,8 @@ async function request<T = any>(endpoint: string, options: RequestOptions = {}):
         errorBody = { message: response.statusText };
       }
 
-      const errorMessage = errorBody.message || `API Error: ${response.status} ${response.statusText}`;
+      const errorMessage =
+        errorBody.message || `API Error: ${response.status} ${response.statusText}`;
 
       // Global toast notification on error
       useAppStore.getState().addToast({
