@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { connectDB } from './shared/db.js';
 
 dotenv.config();
 
@@ -28,6 +29,11 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`BhumiLink API server running on port ${PORT}`);
-});
+async function startServer() {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`BhumiLink API server running on port ${PORT}`);
+  });
+}
+
+startServer();
