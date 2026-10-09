@@ -1,0 +1,24 @@
+{
+  "name": "bhumilink-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n \"web,api\" -c \"cyan,magenta\" \"npm run dev --workspace=@bhumilink/web\" \"npm run dev --workspace=@bhumilink/api\"",
+    "dev:web": "npm run dev --workspace=@bhumilink/web",
+    "dev:api": "npm run dev --workspace=@bhumilink/api",
+    "build": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css}\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "concurrently": "^9.1.2",
+    "eslint": "^10.12.0",
+    "prettier": "^3.5.2",
+    "typescript-eslint": "^8.71.1"
+  }
+}
