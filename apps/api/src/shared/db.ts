@@ -1,8 +1,8 @@
+// ============================= Required ===============================
 import path from 'path';
 import { fileURLToPath } from 'url';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import type { Request, Response, NextFunction } from 'express';
+import { MongoClient, ServerApiVersion, ObjectId, type Db, type Collection } from 'mongodb';
 
 // Support .env in apps/api directory or repository root
 const __filename = fileURLToPath(import.meta.url);
@@ -10,101 +10,117 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/bhumilink';
-const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME || 'bhumilink';
-
-// Cache connection promise across serverless invocations
-let cachedPromise: Promise<typeof mongoose | null> | null = null;
+// ================== Mongo URI and Mongo Client ==============================
+const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/bhumilink';
+const dbName = process.env.MONGODB_DB_NAME || 'bhumilink';
 
 /**
  * Mask credentials in MongoDB connection string for safe logging.
  */
-export function sanitizeMongoUri(uri: string): string {
-  return uri.replace(/\/\/([^:]+):([^@]+)@/, '//$1:****@');
+export function sanitizeMongoUri(rawUri: string): string {
+  return rawUri.replace(/\/\/([^:]+):([^@]+)@/, '//$1:****@');
 }
 
-/**
- * Connect to MongoDB with connection reuse for serverless and containerized environments.
- */
-export async function connectDB(): Promise<typeof mongoose | null> {
-  // 1. If connection is already established, return existing instance immediately
-  if (mongoose.connection.readyState === 1) {
-    return mongoose;
-  }
+// Global cached client instance for Vercel serverless invocation reuse
+let client: MongoClient | null = null;
+let clientPromise: Promise<MongoClient> | null = null;
+let database: Db | null = null;
 
-  // 2. If a connection attempt is in-flight, await the existing promise to avoid parallel handshakes
-  if (cachedPromise) {
-    return cachedPromise;
-  }
-
-  // 3. Initiate connection and cache the promise
-  const sanitizedUri = sanitizeMongoUri(MONGODB_URI);
-  console.log(`[Database] Connecting to MongoDB: ${sanitizedUri} (Database: ${MONGODB_DB_NAME})...`);
-
-  cachedPromise = mongoose
-    .connect(MONGODB_URI, {
-      dbName: MONGODB_DB_NAME,
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 5000,
-      bufferCommands: false,
-    })
-    .then((conn) => {
-      console.log(`[Database] MongoDB connected successfully to ${conn.connection.host}/${conn.connection.name}`);
-      return conn;
-    })
-    .catch((err: any) => {
-      cachedPromise = null;
-      console.error(`[Database] MongoDB connection error: ${err.name || 'Error'} - ${err.message || err}`);
-      return null;
-    });
-
-  return cachedPromise;
-}
-
-/**
- * Disconnect from MongoDB (used during graceful shutdown or CLI scripts).
- */
-export async function disconnectDB(): Promise<void> {
-  if (mongoose.connection.readyState !== 0) {
-    await mongoose.disconnect();
-    cachedPromise = null;
-    console.log('[Database] MongoDB disconnected.');
-  }
-}
-
-/**
- * Middleware for routes that require database connectivity.
- * Awaits connection readiness without blocking unrelated endpoints.
- */
-export async function ensureDbConnection(
-  _req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    const conn = await connectDB();
-    if (!conn || mongoose.connection.readyState !== 1) {
-      res.status(503).json({
-        status: 'error',
-        message: 'Database connection is temporarily unavailable. Please retry shortly.',
-      });
-      return;
+export function getMongoClient(): MongoClient {
+  if (!client) {
+    if (!process.env.MONGODB_URI) {
+      console.warn(
+        '[Database Warning] MONGODB_URI is not set. Defaulting to local fallback mongodb://127.0.0.1:27017/bhumilink. In production Vercel, set MONGODB_URI in Project Settings.'
+      );
     }
-    next();
-  } catch {
-    res.status(503).json({
-      status: 'error',
-      message: 'Failed to establish database connection.',
+    client = new MongoClient(uri, {
+      serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+      },
     });
+  }
+  return client;
+}
+
+// ====================== Connecting to MongoDB ============================
+export async function connectDB(): Promise<Db> {
+  if (database) {
+    return database;
+  }
+
+  const mongoClient = getMongoClient();
+
+  if (!clientPromise) {
+    const sanitized = sanitizeMongoUri(uri);
+    console.log(`[Database] Connecting to MongoDB: ${sanitized} (Database: ${dbName})...`);
+
+    clientPromise = mongoClient
+      .connect()
+      .then(async (c) => {
+        const db = c.db(dbName);
+        await db.command({ ping: 1 });
+        console.log('Successfully connected to MongoDB!');
+        database = db;
+        return c;
+      })
+      .catch((error) => {
+        clientPromise = null;
+        database = null;
+        console.error('MongoDB connection failed:', error.message);
+        throw error;
+      });
+  }
+
+  await clientPromise;
+  database = mongoClient.db(dbName);
+  return database;
+}
+
+export async function disconnectDB(): Promise<void> {
+  if (client) {
+    await client.close();
+    client = null;
+    clientPromise = null;
+    database = null;
+    console.log('[Database] MongoDB connection closed.');
   }
 }
 
-// Lifecycle listeners
-mongoose.connection.on('error', (err) => {
-  console.error('[Database] Connection event error:', err.message);
-});
+// ====================== BhumiLink Collections ============================
+export const COLLECTIONS = {
+  USERS: 'users',
+  LAND_PARCELS: 'landparcels',
+  CSRS_RECORDS: 'csrsrecords',
+  DEEDS: 'deeds',
+  DEED_DOCUMENTS: 'deeddocuments',
+  DIGITAL_DOLILS: 'digitaldolils',
+  MUTATIONS: 'mutations',
+  RSBS_UPDATES: 'rsbsupdates',
+  PAYMENTS: 'payments',
+  NOTIFICATIONS: 'notifications',
+  LAND_TAX_RECORDS: 'landtaxrecords',
+  NOTICES: 'notices',
+  AUDIT_LOGS: 'auditlogs',
+} as const;
 
-mongoose.connection.on('disconnected', () => {
-  cachedPromise = null;
-  console.warn('[Database] Connection event: disconnected.');
-});
+export function getCollections(db: Db) {
+  return {
+    users: db.collection(COLLECTIONS.USERS),
+    landParcels: db.collection(COLLECTIONS.LAND_PARCELS),
+    csrsRecords: db.collection(COLLECTIONS.CSRS_RECORDS),
+    deeds: db.collection(COLLECTIONS.DEEDS),
+    deedDocuments: db.collection(COLLECTIONS.DEED_DOCUMENTS),
+    digitalDolils: db.collection(COLLECTIONS.DIGITAL_DOLILS),
+    mutations: db.collection(COLLECTIONS.MUTATIONS),
+    rsbsUpdates: db.collection(COLLECTIONS.RSBS_UPDATES),
+    payments: db.collection(COLLECTIONS.PAYMENTS),
+    notifications: db.collection(COLLECTIONS.NOTIFICATIONS),
+    landTaxRecords: db.collection(COLLECTIONS.LAND_TAX_RECORDS),
+    notices: db.collection(COLLECTIONS.NOTICES),
+    auditLogs: db.collection(COLLECTIONS.AUDIT_LOGS),
+  };
+}
+
+export { client, ObjectId, ServerApiVersion, type Db, type Collection };

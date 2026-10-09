@@ -34,7 +34,7 @@ Phase 1 established the foundational infrastructure, shared design system, and d
   - API client automatically attaches `X-Role` header to all outgoing requests.
   - Express backend `simulatedAuthMiddleware` automatically injects simulated user metadata.
 - **Database Schemas & Models:**
-  - 13 Mongoose models implemented in `apps/api/src/models/`: `User`, `LandParcel`, `CSRSRecord`, `Deed`, `DeedDocument`, `DigitalDolil`, `Mutation`, `RSBSUpdate`, `Payment`, `Notification`, `LandTaxRecord`, `Notice`, `AuditLog`.
+  - 13 TypeScript schemas & models implemented in `apps/api/src/models/`: `User`, `LandParcel`, `CSRSRecord`, `Deed`, `DeedDocument`, `DigitalDolil`, `Mutation`, `RSBSUpdate`, `Payment`, `Notification`, `LandTaxRecord`, `Notice`, `AuditLog`.
   - Strict enum validation on `transaction_status` (`Available`, `MutationInProgress`, `TransferredUpdated`, `Restricted`).
 - **Database Seeding & Atlas Connectivity:**
   - CLI and programmatic seed module (`apps/api/scripts/seed.ts` and `apps/api/src/shared/seedData.ts`) populating demo users across all roles, 8 land parcels, CS/RS records, notices, and initial notifications.
@@ -54,7 +54,7 @@ Phase 1 established the foundational infrastructure, shared design system, and d
 | **Icons** | Lucide React | Exclusive icon library across all components |
 | **Backend Framework** | Node.js (v24) + Express 4 (`apps/api`) | REST API |
 | **Language** | TypeScript 5 | Strict mode across web and api |
-| **Database** | MongoDB Atlas / Mongoose 8 | Document database with schema enforcement |
+| **Database** | MongoDB Atlas / MongoDB Node Driver 6 (`mongodb`) | Official driver with `MongoClient` & `ServerApiVersion.v1` |
 | **Monorepo & Tooling** | npm workspaces, Concurrently, ESLint, Prettier | Unified linting and build scripts |
 
 ---
@@ -68,10 +68,10 @@ BhumiLink/
 │   │   ├── scripts/
 │   │   │   └── seed.ts                # Database seeding CLI runner
 │   │   ├── src/
-│   │   │   ├── models/                # Mongoose models & schemas (13 models)
+│   │   │   ├── models/                # TypeScript data models & interfaces (13 collections)
 │   │   │   ├── shared/
 │   │   │   │   ├── authMiddleware.ts  # Simulated role-based auth middleware
-│   │   │   │   ├── db.ts              # MongoDB Atlas connection & lifecycle
+│   │   │   │   ├── db.ts              # Native MongoDB Atlas connection & lifecycle
 │   │   │   │   └── seedData.ts        # Modular demo database seeder
 │   │   │   └── index.ts               # Express server entry point
 │   │   ├── .env.example               # Backend environment template
@@ -242,7 +242,7 @@ BhumiLink is structured as an npm workspaces monorepo with two independent Verce
 - **Output Directory:** Leave blank
 - **Serverless Configuration:** Configured in `apps/api/vercel.json` using `@vercel/node` routing all traffic `/(.*)` to `src/index.ts`.
 - **Express Serverless Export:** `apps/api/src/index.ts` exports `app` as default (`export default app`). When `process.env.VERCEL` is present, `app.listen()` is bypassed so Vercel can manage invocations.
-- **MongoDB Connection Reuse:** Database connections are cached using `cachedPromise` in `apps/api/src/shared/db.ts` to prevent connection exhaustion across warm serverless invocations. Root endpoint `/` and `/api` respond immediately without awaiting database connections.
+- **MongoDB Connection Reuse:** The official MongoDB client and database connection are cached across invocations in `apps/api/src/shared/db.ts` to prevent connection leaks across warm serverless invocations. Root endpoint `/` and `/api` respond immediately without awaiting database connections.
 - **Required Production Environment Variables (Vercel Project Settings):**
   - `MONGODB_URI`: MongoDB Atlas connection string (e.g. `mongodb+srv://...`)
   - `MONGODB_DB_NAME`: Database name (e.g. `bhumilink`)
@@ -267,7 +267,7 @@ BhumiLink is structured as an npm workspaces monorepo with two independent Verce
 - [x] Bilingual localization with Bengali numerals and currency formatting.
 - [x] Citizen and Staff application layouts.
 - [x] Role-switcher mechanism with simulated auth context.
-- [x] MongoDB Atlas connection and Mongoose schemas for all 13 collections.
+- [x] MongoDB Atlas connection and native driver collection schemas for all 13 collections.
 - [x] Database seed script with demo data.
 
 ### Known Limitations in Current Phase

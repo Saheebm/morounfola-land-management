@@ -1,18 +1,17 @@
+// ============================= Required ===============================
+import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
-import { connectDB, ensureDbConnection } from './shared/db.js';
+import { connectDB, COLLECTIONS } from './shared/db.js';
 import { simulatedAuthMiddleware } from './shared/authMiddleware.js';
-import { User, LandParcel, Notice } from './models/index.js';
-import { seedDatabase } from './shared/seedData.js';
 
 dotenv.config();
 
+// =============== Initial Ports and Connections =============================
 const app = express();
-const PORT = process.env.PORT || 5000;
+const port = process.env.PORT || 5000;
 
-// Enable CORS for frontend requests (local dev & production Vercel)
+// ====================== Middleware ===================================
 app.use(
   cors({
     origin: true,
@@ -22,11 +21,9 @@ app.use(
   })
 );
 app.use(express.json());
-
-// Simulated auth middleware attaching mock role context
 app.use(simulatedAuthMiddleware);
 
-// --- Root Endpoints (instant check, no DB dependency) ---
+// ============================ Test API ===================================
 app.get(['/', '/api'], (_req: Request, res: Response) => {
   res.json({
     status: 'Good',
@@ -34,47 +31,64 @@ app.get(['/', '/api'], (_req: Request, res: Response) => {
   });
 });
 
-// --- Health Check Endpoints ---
+// ====================== Health Check ======================================
 app.get(['/api/health', '/health'], async (_req: Request, res: Response) => {
-  let isConnected = mongoose.connection.readyState === 1;
-  if (!isConnected) {
-    const conn = await connectDB();
-    isConnected = conn !== null && mongoose.connection.readyState === 1;
-  }
+  try {
+    const database = await connectDB();
+    await database.command({ ping: 1 });
 
-  res.status(isConnected ? 200 : 503).json({
-    status: isConnected ? 'ok' : 'degraded',
-    database: isConnected ? 'connected' : 'disconnected',
-    service: 'BhumiLink API',
-    timestamp: new Date().toISOString(),
-  });
+    res.json({
+      status: 'ok',
+      database: 'connected',
+      service: 'BhumiLink API',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error: any) {
+    res.status(503).json({
+      status: 'degraded',
+      database: 'disconnected',
+      service: 'BhumiLink API',
+      error: error.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
-// --- Auth Context Endpoint ---
+// ====================== Auth Context ======================================
 app.get(['/api/auth/me', '/auth/me'], (req: Request, res: Response) => {
   res.json({
     user: req.user,
   });
 });
 
-// --- Domain Data Endpoints (Requires Database) ---
-
-// Public Notices
-app.get(['/api/notices', '/notices'], ensureDbConnection, async (_req: Request, res: Response) => {
+// ====================== Public Notices ====================================
+app.get(['/api/notices', '/notices'], async (_req: Request, res: Response) => {
   try {
-    const notices = await Notice.find().sort({ published_at: -1 }).limit(10);
+    const database = await connectDB();
+    const noticesCollection = database.collection(COLLECTIONS.NOTICES);
+
+    const notices = await noticesCollection
+      .find({})
+      .sort({ published_at: -1 })
+      .limit(10)
+      .toArray();
+
     res.json({
       success: true,
       count: notices.length,
       data: notices,
     });
-  } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
+  } catch (error: any) {
+    console.error('Failed to fetch notices:', error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 });
 
-// Land Parcels (with filter support)
-app.get(['/api/parcels', '/parcels'], ensureDbConnection, async (req: Request, res: Response) => {
+// ====================== Land Parcels ======================================
+app.get(['/api/parcels', '/parcels'], async (req: Request, res: Response) => {
   try {
     const { mouza, dag, khatian } = req.query;
     const filter: Record<string, any> = {};
@@ -82,58 +96,69 @@ app.get(['/api/parcels', '/parcels'], ensureDbConnection, async (req: Request, r
     if (dag) filter.dag = String(dag);
     if (khatian) filter.khatian = String(khatian);
 
-    const parcels = await LandParcel.find(filter).limit(20);
+    const database = await connectDB();
+    const landParcelsCollection = database.collection(COLLECTIONS.LAND_PARCELS);
+
+    const parcels = await landParcelsCollection
+      .find(filter)
+      .limit(20)
+      .toArray();
+
     res.json({
       success: true,
       count: parcels.length,
       data: parcels,
     });
-  } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
+  } catch (error: any) {
+    console.error('Failed to fetch parcels:', error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 });
 
-// System Stats
-app.get(['/api/stats', '/stats'], ensureDbConnection, async (_req: Request, res: Response) => {
+// ====================== System Stats ======================================
+app.get(['/api/stats', '/stats'], async (_req: Request, res: Response) => {
   try {
+    const database = await connectDB();
     const [totalParcels, totalNotices, totalUsers] = await Promise.all([
-      LandParcel.countDocuments(),
-      Notice.countDocuments(),
-      User.countDocuments(),
+      database.collection(COLLECTIONS.LAND_PARCELS).countDocuments(),
+      database.collection(COLLECTIONS.NOTICES).countDocuments(),
+      database.collection(COLLECTIONS.USERS).countDocuments(),
     ]);
+
     res.json({
       success: true,
       data: { totalParcels, totalNotices, totalUsers },
     });
-  } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
+  } catch (error: any) {
+    console.error('Failed to fetch stats:', error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 });
 
-// --- Standalone Server Startup (for local development) ---
-async function startServer() {
-  const conn = await connectDB();
-  if (conn) {
-    try {
-      const userCount = await User.countDocuments();
-      if (userCount === 0) {
-        console.log('[Database] Database is empty, auto-seeding demo records...');
-        await seedDatabase(false);
-      }
-    } catch (err) {
-      console.warn('[Database] Auto-seed check skipped:', err);
-    }
+// ====================== Connecting to MongoDB & Server Startup =============
+async function run() {
+  try {
+    await connectDB();
+  } catch (error: any) {
+    console.error('MongoDB connection failed:', error.message);
   }
 
-  app.listen(PORT, () => {
-    console.log(`BhumiLink API server running on port ${PORT}`);
-  });
+  // Standalone server execution for local development
+  if (!process.env.VERCEL) {
+    app.listen(port, () => {
+      console.log(`BhumiLink API server running on port ${port}`);
+    });
+  }
 }
 
-// In local execution, boot HTTP listener; in serverless (e.g. Vercel), export app
-if (!process.env.VERCEL) {
-  startServer();
-}
+run();
 
+// Export app for Vercel serverless functions
 export default app;
 export { app };

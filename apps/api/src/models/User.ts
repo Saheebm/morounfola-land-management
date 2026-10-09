@@ -1,8 +1,9 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 export type UserRole = 'citizen' | 'dolil-lekhok' | 'sub-registrar' | 'mutation-officer' | 'admin';
 
-export interface IUser extends Document {
+export interface IUser {
+  _id?: ObjectId;
   name_bn: string;
   name_en: string;
   role: UserRole;
@@ -10,24 +11,5 @@ export interface IUser extends Document {
   email?: string;
   phone?: string;
   nid?: string;
-  created_at: Date;
+  created_at?: Date;
 }
-
-const UserSchema = new Schema<IUser>(
-  {
-    name_bn: { type: String, required: true },
-    name_en: { type: String, required: true },
-    role: {
-      type: String,
-      enum: ['citizen', 'dolil-lekhok', 'sub-registrar', 'mutation-officer', 'admin'],
-      required: true,
-    },
-    active: { type: Boolean, default: true },
-    email: { type: String },
-    phone: { type: String },
-    nid: { type: String },
-  },
-  { timestamps: { createdAt: 'created_at', updatedAt: false } }
-);
-
-export const User = mongoose.model<IUser>('User', UserSchema);
