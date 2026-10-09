@@ -11,6 +11,7 @@
     "dev:web": "npm run dev --workspace=@bhumilink/web",
     "dev:api": "npm run dev --workspace=@bhumilink/api",
     "build": "npm run build --workspaces",
+    "seed": "npm run seed --workspace=@bhumilink/api",
     "lint": "npm run lint --workspaces --if-present",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css}\""
   },
