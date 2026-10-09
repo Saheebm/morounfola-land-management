@@ -1,4 +1,4 @@
-# BhumiLink (ভূমিলিংক) — Digital Land Services Portal
+# BhumiLink (ভূূমিযোগ) — Digital Land Services Portal
 
 **BhumiLink** is a digital land services portal designed to provide transparent land registration, prevent fraudulent double-selling through real-time transaction-safety status visibility, and coordinate multi-step workflows between citizens and government land officials in Bangladesh.
 
