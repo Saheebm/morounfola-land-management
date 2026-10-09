@@ -90,8 +90,22 @@ Set up the core project architecture, establish the design system, configure the
 - Test the role-switcher dropdown and verify the `X-Role` header is sent in API requests.
 
 ## 8. Acceptance Criteria
-- Monorepo is correctly structured and runs concurrently.
-- Tailwind configuration accurately reflects the design tokens.
-- All defined MongoDB collections can be queried successfully after running the seed script.
-- The UI primitives library is complete, fully accessible, and styled correctly.
-- Role switching updates the global state and subsequent API requests.
+- [x] Monorepo is correctly structured and runs concurrently.
+- [x] Tailwind configuration accurately reflects the design tokens.
+- [x] All defined MongoDB collections can be queried successfully after running the seed script.
+- [x] The UI primitives library is complete, fully accessible, and styled correctly.
+- [x] Role switching updates the global state and subsequent API requests.
+
+## 9. Execution Progress & Verification Log
+
+| Task | Description | Status | Commit Hash | Verification Notes |
+|---|---|---|---|---|
+| **Task 1.1** | Monorepo & Tooling Setup | Completed | `896f777` | `apps/web` (Vite, React 19, TS) and `apps/api` (Express, TS) scaffolded; shared ESLint, Prettier, root concurrently script verified. |
+| **Task 1.2** | Design System Configuration | Completed | `8665e10` | Tailwind tokens from Design.md §5 configured; CSS variables and `:focus-visible` added to `index.css`; Hind Siliguri, Noto Sans Bengali, and Inter fonts loaded in `index.html`. |
+| **Task 1.3** | Localization Setup | Completed | `c6fff08` | `i18next` configured with `bn` primary and `en` fallback; glossary and UI terms populated; `formatCurrency()`, `formatNumber()`, and `toBengaliNumerals()` implemented and tested. |
+| **Task 1.4** | Database & Models Setup | Completed | `9443f2b` | Mongoose connection handler implemented; all 13 schemas defined (`User`, `LandParcel`, `CSRSRecord`, `Deed`, `DeedDocument`, `DigitalDolil`, `Mutation`, `RSBSUpdate`, `Payment`, `Notification`, `LandTaxRecord`, `Notice`, `AuditLog`); `transaction_status` enums enforced. |
+| **Task 1.5** | Simulated Auth & API Client | Completed | `be0c16d` | Zustand store (`useAppStore`) managing 5 roles, language, unread notifications, and toasts; `api.ts` attaches `X-Role` header; `simulatedAuthMiddleware` attaches demo user context in Express. |
+| **Task 1.6** | Shared UI Primitives | Completed | `0d94213` | All Design.md §8 & §9 components built: `Button`, `Card`, `StatusBadge` (with central `statusMap.ts`), `FormField`, `DataTable`, `Modal`, `ToastContainer`, `TransactionStatusPanel`, `ComparisonTable`. Type check and lint pass with 0 errors. |
+| **Task 1.7** | Application Layouts & Routes | Completed | `510d0c5` | `CitizenLayout` (with 4px flag accent line, header, nav, footer) and `StaffLayout` (with 256px `brand-900` sidebar, mobile off-canvas drawer) implemented; `RoleSwitcher` interactive dropdown; React Router v7 routes configured; `/kitchen-sink` preview route created and verified. |
+| **Task 1.8** | Seed Data Script | Completed | `593074b` | `scripts/seed.ts` and `src/shared/seedData.ts` created; inserts 5 demo users, 8 land parcels covering all `transaction_status` enums, CS/RS records, notices, and notifications; auto-seed hook added on API boot. |
+
