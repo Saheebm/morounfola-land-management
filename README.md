@@ -195,9 +195,23 @@ Or run each service individually:
   ```bash
   npm run dev:api
   ```
-  Accessible at: `http://localhost:5000/api`
-  Health check: `http://localhost:5000/api/health`
-  Simulated auth: `http://localhost:5000/api/auth/me`
+  - Root endpoint: `http://localhost:5000/` or `http://localhost:5000/api`
+  - Health check: `http://localhost:5000/api/health`
+  - Simulated auth: `http://localhost:5000/api/auth/me`
+  - Public Notices: `http://localhost:5000/api/notices`
+  - Land Parcels: `http://localhost:5000/api/parcels`
+  - System Stats: `http://localhost:5000/api/stats`
+
+### API Endpoints Summary
+
+| Method | Endpoint(s) | Description | Database Required |
+|---|---|---|---|
+| `GET` | `/`, `/api` | Root status confirmation (`{"status": "Good", "message": "Api is running !"}`) | No (immediate 200 OK) |
+| `GET` | `/api/health`, `/health` | Full system health check and database connectivity status | Checks readiness |
+| `GET` | `/api/auth/me` | Simulated user profile based on `X-Role` request header | No |
+| `GET` | `/api/notices`, `/notices` | Active official notices and circulars | Yes |
+| `GET` | `/api/parcels`, `/parcels` | Land parcels with search filters (`mouza`, `dag`, `khatian`) | Yes |
+| `GET` | `/api/stats`, `/stats` | Aggregated system metrics (parcels, notices, users) | Yes |
 
 ### Building & Checking Code
 
@@ -216,7 +230,36 @@ Or run each service individually:
 
 ---
 
-## 9. Current Implementation Status & Roadmap
+## 9. Vercel Deployment Guide
+
+BhumiLink is structured as an npm workspaces monorepo with two independent Vercel deployments:
+
+### 1. Backend API Deployment (`apps/api`)
+
+- **Vercel Project Root Directory:** `apps/api`
+- **Framework Preset:** Other
+- **Build Command:** `npm run build`
+- **Output Directory:** Leave blank
+- **Serverless Configuration:** Configured in `apps/api/vercel.json` using `@vercel/node` routing all traffic `/(.*)` to `src/index.ts`.
+- **Express Serverless Export:** `apps/api/src/index.ts` exports `app` as default (`export default app`). When `process.env.VERCEL` is present, `app.listen()` is bypassed so Vercel can manage invocations.
+- **MongoDB Connection Reuse:** Database connections are cached using `cachedPromise` in `apps/api/src/shared/db.ts` to prevent connection exhaustion across warm serverless invocations. Root endpoint `/` and `/api` respond immediately without awaiting database connections.
+- **Required Production Environment Variables (Vercel Project Settings):**
+  - `MONGODB_URI`: MongoDB Atlas connection string (e.g. `mongodb+srv://...`)
+  - `MONGODB_DB_NAME`: Database name (e.g. `bhumilink`)
+
+### 2. Frontend Web Deployment (`apps/web`)
+
+- **Vercel Project Root Directory:** `apps/web`
+- **Framework Preset:** Vite
+- **Build Command:** `npm run build`
+- **Output Directory:** `dist`
+- **SPA Routing:** Configured in `apps/web/vercel.json` with a rewrite rule (`/(.*) -> /`) so direct navigation and refreshes on nested routes work cleanly without 404 errors.
+- **Required Production Environment Variables (Vercel Project Settings):**
+  - `VITE_API_BASE_URL`: URL of the deployed backend API (e.g. `https://bhumilink-api.vercel.app/api`). The frontend API client in `apps/web/src/lib/api.ts` automatically strips duplicate `/api` prefixes if appended.
+
+---
+
+## 10. Current Implementation Status & Roadmap
 
 ### Current Status: Phase 1 Complete
 - [x] Monorepo structure and shared tooling.
